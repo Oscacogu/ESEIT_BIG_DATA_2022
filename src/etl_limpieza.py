@@ -5,7 +5,7 @@
  # 4. convertir campo 'FECHA_INICIO_DESPLAZAMIENTO_MOVIL'a datetime
  # 5. corregir campo 'RECEPCION', crenado 'RECEPCION CORREGIDA'
  # 6. reemplazar SIN_DATO por un valor nulo de tipo numerico en el campo 'EDAD'
- # 7. eliminar espacios al inicio y al final del campo 'LOCALIDAD' 
+ # 7. limpiar el campo 'LOCALIDAD' 
  # 3. guardar el resumen de formato .csv
 
 
@@ -30,8 +30,8 @@ def main():
     df_RECEPCION_ok = corregir_recepcion(df_FECHA_INICIO_ok)
     #corrige campo 'EDAD'
     df_EDAD_ok = corregir_edad(df_RECEPCION_ok)
-    #quita espacios en campo 'LOCALIDAD'
-    df_final = quitar_espacios(df_EDAD_ok)
+    #corregir 'LOCALIDAD'
+    df_final = corregir_localidad(df_EDAD_ok)
     # guarde el resumen
     save_data(df_final, filename = "llamadas123_julio_2022_processed.csv")
 
@@ -42,9 +42,16 @@ def save_data(df, filename):
 
     df.to_csv(out_path)
 
-def quitar_espacios(df):
-    df['LOCALIDAD']= df['LOCALIDAD'].apply(lambda x: x.strip())
+def corregir_localidad(df):
+    Localidades = {1:'USAQUEN', 2:'CHAPINERO', 3:'SANTA FE', 4:'SAN CRISTOBAL',  
+    5:'USME', 6:'TUNJUELITO', 7:'BOSA', 8: 'KENNEDY', 9: 'FONTIBON', 10: 'ENGATIVA', 11: 'SUBA', 12: 'BARRIOS UNIDOS',
+    13: 'TEUSAQUILLO', 14: 'LOS MARTIRES', 15: 'ANTONIO NARIÑO', 16: 'PUENTE ARANDA', 17: 'LA CANDELARIA', 18: 'RAFAEL URIBE URIBE',
+    19: 'CIUDAD BOLIVAR', 20: 'SUMAPAZ'}
+
+    df['LOCALIDAD'] = df['CODIGO_LOCALIDAD'].map(Localidades)
+
     df_final = df
+    
     return df_final     
 
 def corregir_edad(df):
