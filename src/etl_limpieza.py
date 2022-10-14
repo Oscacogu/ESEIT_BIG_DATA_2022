@@ -15,11 +15,12 @@ import os
 from pathlib import Path
 from dateutil.parser import parse
 import numpy as np
+import glob
 
 def main():
 
     #leer archivo
-    data = get_data(filename = "llamadas123_julio_2022.csv")
+    data = get_data(folder = "Data")
     #eliminar duplicados
     df_sin_duplicados = elimina_duplicados(data)
     #reemplaza nulos por SIN_DATO
@@ -33,7 +34,7 @@ def main():
     #corregir 'LOCALIDAD'
     df_final = corregir_localidad(df_EDAD_ok)
     # guarde el resumen
-    save_data(df_final, filename = "llamadas123_julio_2022_processed.csv")
+    save_data(df_final, filename = "llamadas123_processed.csv")
 
 def save_data(df, filename):
     out_name = "resumen_" + filename
@@ -56,8 +57,8 @@ def corregir_localidad(df):
 
 def corregir_edad(df):
     df['EDAD']=df['EDAD'].replace({'SIN_DATO': np.nan})
-    f = lambda x: x if pd.isna(x) == True else int(x)
-    df['EDAD']=df['EDAD'].apply(f)
+    #f = lambda x: x if pd.isna(x) == True else int(x)
+    #df['EDAD']=df['EDAD'].apply(f)
     df_EDAD_ok = df
     return df_EDAD_ok
 
@@ -101,12 +102,19 @@ def elimina_duplicados(data):
     df_sin_duplicados = df_sin_duplicados.reset_index() 
     return df_sin_duplicados    
 
-def get_data(filename):
+def get_data(folder):
     data_dir = "raw"
     root_dir = Path(".").resolve()
-    file_path=os.path.join(root_dir, "data", data_dir, filename)
+    file_path=os.path.join(root_dir, folder, data_dir)
 
-    data = pd.read_csv(file_path, encoding = 'latin-1', sep = ';')
+    files = glob.glob(os.path.join(file_path, "*.csv"))
+    data = []
+    for f in files:
+        data_f = pd.read_csv(f, encoding = 'latin-1', sep = ';')
+        data.append(data_f)
+    #data = pd.read_csv(file_path, encoding = 'latin-1', sep = ';')
+    data = pd.concat(data, ignore_index= True)
+    print(data)
     return data   
 
 
